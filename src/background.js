@@ -4,6 +4,7 @@ import { app, protocol, BrowserWindow } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 const isDevelopment = process.env.NODE_ENV !== "production";
+var path = require("path")
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -23,7 +24,8 @@ function createWindow() {
             // Use pluginOptions.nodeIntegration, leave this alone
             // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
             webSecurity: false,
-            nodeIntegration: true
+            nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+            preload: path.join(__dirname, 'preload.js')
         }
     });
 
@@ -90,7 +92,17 @@ if (isDevelopment) {
 }
 
 const { ipcMain } = require("electron");
+const pdf2img = require("./node/pdf2img");
+// const pdf2svg = require("./node/pdf2svg");
+const isNodeJS =
+  typeof process === "object" &&
+  process + "" === "[object process]" &&
+  !process.versions.nw &&
+  !(process.versions.electron && process.type && process.type !== "browser");
 
+console.log("123", isNodeJS);
 ipcMain.on("onTransfer", (event, fileList) => {
     console.log(fileList);
+    const path = fileList[0].path;
+    pdf2img(path);
 });

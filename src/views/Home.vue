@@ -13,7 +13,6 @@
 </template>
 
 <script>
-const { ipcRenderer } = window.require("electron");
 export default {
     data() {
         return {
@@ -45,7 +44,7 @@ export default {
         onSelectAllClick() {},
         onRemoveClick() {},
         onTransferClick() {
-            ipcRenderer.send("onTransfer", this.fileList);
+            window.ipcRenderer.send("onTransfer", this.fileList);
         }
     }
 };
