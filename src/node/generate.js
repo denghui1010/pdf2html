@@ -6,9 +6,12 @@ const path = require("path");
 function generate(params) {
     const title = params.title || "output";
     const artName = params.artName || "html.art";
+    let setting = fs.readFileSync(path.resolve(__dirname, "setting.json"));
+    setting = JSON.parse(setting);
     const html = template(path.resolve(__dirname, artName), {
         title,
-        content: params.content
+        content: params.content,
+        setting
     });
     fs.writeFile(title + ".html", html, function(error) {
         if (error) {

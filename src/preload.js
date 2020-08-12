@@ -1,2 +1,4 @@
-import { ipcRenderer } from 'electron'
-window.ipcRenderer = ipcRenderer
+import { ipcRenderer } from "electron";
+import { remote } from "electron";
+window.ipcRenderer = ipcRenderer;
+window.remote = remote;

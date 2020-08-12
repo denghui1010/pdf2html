@@ -53,7 +53,7 @@ NodeCanvasFactory.prototype = {
 };
 
 var pdfjsLib = require("./pdfjs-dist/build/pdf.js");
-pdfjsLib.GlobalWorkerOptions.workerSrc = "./pdf.worker.js"
+pdfjsLib.GlobalWorkerOptions.workerSrc = "./pdf.worker.js";
 
 // Some PDFs need external cmaps.
 var CMAP_URL = "./pdfjs-dist/cmaps/";
@@ -70,50 +70,60 @@ function pdf2img(pdfPath) {
     });
     loadingTask.promise
         .then(function(pdfDocument) {
-            console.log("# PDF document loaded.");
-            // Get the first page.
-            pdfDocument.getPage(1).then(function(page) {
-                // Render the page on a Node canvas with 100% scale.
-                var viewport = page.getViewport({ scale: 1.0 });
-                var canvasFactory = new NodeCanvasFactory();
-                var canvasAndContext = canvasFactory.create(
-                    viewport.width,
-                    viewport.height
-                );
-                var renderContext = {
-                    canvasContext: canvasAndContext.context,
-                    viewport: viewport,
-                    canvasFactory: canvasFactory
-                };
+            var numPages = pdfDocument.numPages;
+            console.log("# Document Loaded");
+            console.log("Number of Pages: " + numPages);
+            console.log();
+            const content = [];
+            var lastPromise = Promise.resolve(); // will be used to chain promises
+            var loadPage = function(pageNum) {
+                return pdfDocument.getPage(pageNum).then(function(page) {
+                    // Render the page on a Node canvas with 100% scale.
+                    var viewport = page.getViewport({ scale: 1.5 });
+                    var canvasFactory = new NodeCanvasFactory();
+                    var canvasAndContext = canvasFactory.create(
+                        viewport.width,
+                        viewport.height
+                    );
+                    var renderContext = {
+                        canvasContext: canvasAndContext.context,
+                        viewport: viewport,
+                        canvasFactory: canvasFactory
+                    };
 
-                var renderTask = page.render(renderContext);
-                renderTask.promise.then(function() {
-                    // Convert the canvas to an image buffer.
-                    // var image = canvasAndContext.canvas.toBuffer();
-                    var image = canvasAndContext.canvas.toDataURL('image/jpg');
-                    const params = {
-                        title: "测试文档",
-                        artName: "html2.art",
-                        content: [
-                            image
-                        ]
-                    }
-                    generate(params);
-                    // fs.writeFile("output.png", image, function(error) {
-                    //     if (error) {
-                    //         console.error("Error: " + error);
-                    //     } else {
-                    //         console.log(
-                    //             "Finished converting first page of PDF file to a PNG image."
-                    //         );
-                    //     }
-                    // });
+                    var renderTask = page.render(renderContext);
+                    return renderTask.promise.then(function() {
+                        // Convert the canvas to an image buffer.
+                        // var image = canvasAndContext.canvas.toBuffer();
+                        const image = canvasAndContext.canvas.toDataURL(
+                            "image/jpeg", 0.4
+                        );
+                        content.push(image);
+                        if (pageNum == numPages) {
+                            const params = {
+                                title: "测试文档",
+                                artName: "html2.art",
+                                content: content
+                            };
+                            generate(params);
+                        }
+                    });
                 });
-            });
+            };
+            for (let i = 1; i <= numPages; i++) {
+                lastPromise = lastPromise.then(loadPage.bind(null, i));
+            }
+
+            return lastPromise;
         })
-        .catch(function(reason) {
-            console.log(reason);
-        });
+        .then(
+            function() {
+                console.log("# End of Document");
+            },
+            function(err) {
+                console.error("Error: " + err);
+            }
+        );
 }
 
 // Loading file from file system into typed array.
