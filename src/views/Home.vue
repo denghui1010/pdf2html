@@ -4,23 +4,28 @@
             .file-nav 
                 .nav1 文件名称
                 .nav2 文档标题
+                .nav3 操作
             .filelist
-                .file-item(v-for="(file, index) in fileList", :key="index") 
-                    .file-name {{file.name}}
-                    .file-title
-                        input(placeholder="不填默认为文件名称")
+                .file-item(:class="{success:file.status==='success', error:file.status==='error'}", v-for="(file, index) in fileList", :key="index")
+                    .item-content
+                        .file-index {{index+1}}
+                        .file-name 
+                            span {{file.name}}
+                            span.status(v-if="file.status") {{file.status}}
+                        .file-title
+                            textarea(v-model="file.title", placeholder="不填默认为文件名")
+                        .file-remove(@click="onRemoveClick(index)") 移除
+                    .item-error(v-if="file.error") {{file.error}}
             .opt
                 .btn.clear(@click="onClearClick") 清空
-                .btn.selectAll(@click="onSelectAllClick") 全选
-                .btn.remove(@click="onRemoveClick") 移除
                 .btn.transferbtn(@click="onTransferClick") 转换
         .drag-tip(v-else) 
             div 拖拽文件或文件夹到这里!
         .bottom
             .log {{log}}
             .bottom-groups
-                img.icon.settingicon(src="@/assets/icon_file.png", @click="onOpenClick")
-                img.icon.openicon(src="@/assets/icon_setting.png", @click="onSettingClick")
+                img.icon(src="@/assets/icon_file.png", @click="onOpenClick")
+                img.icon(src="@/assets/icon_setting.png", @click="onSettingClick")
         setting(:show.sync="showSetting")
 </template>
 
@@ -28,21 +33,89 @@
 import Setting from "./Setting";
 const fs = window.require("fs");
 const path = window.require("path");
+const { ipcRenderer } = window.require("electron");
+const { dialog } = window.require("electron").remote;
 export default {
     components: { Setting },
     data() {
         return {
-            fileList: [
-                // { name: "123" }, { name: "234" }
-            ],
+            fileList: [],
             showSetting: false,
             log: ""
         };
     },
+    created() {
+        window.ipcRenderer.on("onTransferProcess", (event, file) => {
+            console.log("onTransferProcess", file);
+            for (let one of this.fileList) {
+                if (one.path === file.path) {
+                    one.status = "handling...";
+                    break;
+                }
+            }
+            this.fileList = this.fileList.slice();
+        });
+        window.ipcRenderer.on("onTransferSuccess", (event, file) => {
+            console.log("onTransferSuccess", file);
+            for (let one of this.fileList) {
+                if (one.path === file.path) {
+                    one.status = "success";
+                    break;
+                }
+            }
+            this.fileList = this.fileList.slice();
+        });
+        window.ipcRenderer.on("onTransferError", (event, file, error) => {
+            console.log("onTransferError", file);
+            for (let one of this.fileList) {
+                if (one.path === file.path) {
+                    one.status = "error";
+                    one.error = error;
+                    break;
+                }
+            }
+            this.fileList = this.fileList.slice();
+        });
+    },
+    beforeDestroy() {
+        window.ipcRenderer.removeAllListeners("onTransferSuccess");
+        window.ipcRenderer.removeAllListeners("onTransferProcess");
+    },
     methods: {
-        onDrop(e) {
-            e.preventDefault();
-            const files = [];
+        parseFileTile(name) {
+            if (name.indexOf("产品说明书") > -1) {
+                return "产品说明书";
+            } else if (name.indexOf("风险揭示书") > -1) {
+                return "风险揭示书";
+            } else if (name.indexOf("投资者权益须知") > -1) {
+                return "投资者权益须知";
+            } else if (name.indexOf("销售文件目录") > -1) {
+                return "销售文件目录";
+            } else if (name.indexOf("销售协议书") > -1) {
+                return "销售协议书";
+            } else if (name.indexOf("预约申购申请书") > -1) {
+                return "预约申购申请书";
+            } else if (name.indexOf("预约赎回申请书") > -1) {
+                return "预约赎回申请书";
+            } else if (name.indexOf("产品销售文件") > -1) {
+                return "产品销售文件";
+            } else if (name.indexOf("产品协议书") > -1) {
+                return "产品协议书";
+            } else if (name.indexOf("代理销售理财子") > -1) {
+                return "代销总协议";
+            }
+            return name;
+        },
+        isExist(path) {
+            for (let file of this.fileList) {
+                if (file.path === path) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        addFile(file) {},
+        listFiles(files) {
             let totoalCount = 0;
             let validCount = 0;
             let invalidCount = 0;
@@ -56,66 +129,84 @@ export default {
                 } else {
                     validCount++;
                     const f = {};
-                    f.name = file.name;
+                    f.name = file.name.replace(path.extname(file.name), "");
+                    f.title = this.parseFileTile(f.name);
                     f.path = file.path;
                     this.fileList.push(f);
                 }
             };
-            [].forEach.call(
-                e.dataTransfer.files,
-                file => {
+            try {
+                for (let file of files) {
                     console.log(file);
-                    fs.stat(file.path, (err, stats) => {
-                        if (err) {
-                            console.error(err);
-                            this.log = err;
-                            return;
-                        }
-                        if (stats.isDirectory()) {
-                            fs.readdir(file.path, (err, innerFiles) => {
-                                if (err) {
-                                    console.error(err);
-                                    this.log = err;
-                                    return;
-                                }
-                                innerFiles.forEach(innerFile => {
-                                    console.log(innerFile);
-                                    addFile({
-                                        name: innerFile,
-                                        path: path.resolve(file.path, innerFile)
-                                    });
-                                });
+                    const stats = fs.statSync(file.path);
+                    if (stats.isDirectory()) {
+                        const innerFiles = fs.readdirSync(file.path);
+                        innerFiles.forEach(innerFile => {
+                            addFile({
+                                name: innerFile,
+                                path: path.resolve(file.path, innerFile)
                             });
-                        } else {
-                            addFile(file);
-                        }
-                    });
-                },
-                false
-            );
+                        });
+                    } else {
+                        addFile(file);
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                this.log = err;
+            }
             this.log = `add ${totoalCount} files, ${validCount} valid, ${invalidCount} invalid, ${duplicateCount} duplicate`;
             console.log(this.fileList);
         },
-        isExist(path) {
-            for (let file of this.fileList) {
-                if (file.path === path) {
-                    return true;
-                }
-            }
-            return false;
+        onDrop(e) {
+            e.preventDefault();
+            const files = [];
+            [].forEach.call(
+                e.dataTransfer.files,
+                file => {
+                    files.push(file);
+                },
+                false
+            );
+            this.listFiles(files);
         },
         dragover(e) {
             e.preventDefault();
         },
+        onRemoveClick(index) {
+            this.fileList.splice(index, 1);
+        },
         onClearClick() {
             this.fileList = [];
+            this.log = "";
         },
-        onSelectAllClick() {},
-        onRemoveClick() {},
         onTransferClick() {
-            window.ipcRenderer.send("onTransfer", this.fileList);
+            ipcRenderer.send("onTransfer", this.fileList);
         },
-        onOpenClick() {},
+        onOpenClick() {
+            dialog
+                .showOpenDialog({
+                    properties: [
+                        "openFile",
+                        "openDirectory",
+                        "multiSelections"
+                    ],
+                    filters: [{ name: "PDF", extensions: ["pdf"] }],
+                    securityScopedBookmarks: true
+                })
+                .then(result => {
+                    const files = [];
+                    for (let filePath of result.filePaths) {
+                        files.push({
+                            path: filePath,
+                            name: path.basename(filePath)
+                        });
+                    }
+                    if (files.length > 0) {
+                        this.listFiles(files);
+                    }
+                });
+        },
         onSettingClick() {
             this.showSetting = true;
         }
@@ -147,7 +238,7 @@ export default {
         .file-nav {
             display: flex;
             padding: 4px;
-            background: #ddd;
+            background: #eee;
             text-align: center;
 
             .nav1 {
@@ -159,6 +250,10 @@ export default {
                 width: 0;
                 flex-grow: 1;
             }
+
+            .nav3 {
+                width: 40px;
+            }
         }
 
         .filelist {
@@ -166,32 +261,78 @@ export default {
             border: 1px solid #ddd;
             text-align: left;
 
+            .success {
+                background: rgba(0, 255, 0, 0.05);
+            }
+
+            .error {
+                background: rgba(255, 0, 0, 0.05);
+            }
+
             .file-item {
-                display: flex;
                 border-bottom: 1px solid #ddd;
 
                 &:last-child {
                     border-bottom: none;
                 }
 
-                .file-name {
-                    padding: 10px 8px;
-                    width: 0;
-                    flex-grow: 1;
-                    border-right: 1px solid #ddd;
-                    font-size: 14px;
+                .item-content {
+                    display: flex;
+
+                    .file-index {
+                        align-self: center;
+                        padding: 0 10px;
+                        font-size: 14px;
+                        width: 18px;
+                    }
+
+                    .file-name {
+                        padding: 10px 8px;
+                        width: 0;
+                        flex-grow: 1;
+                        border-left: 1px solid #ddd;
+                        border-right: 1px solid #ddd;
+                        font-size: 14px;
+
+                        .status {
+                            margin-left: 4px;
+                            font-size: 12px;
+                            border-radius: 2px;
+                            background: #eee;
+                            padding: 0 4px;
+                        }
+                    }
+
+                    .file-title {
+                        padding: 6px 8px;
+                        width: 0;
+                        flex-grow: 1;
+                        display: flex;
+                        font-size: 14px;
+                        border-right: 1px solid #ddd;
+
+                        input {
+                            flex-grow: 1;
+                        }
+
+                        textarea {
+                            flex-grow: 1;
+                        }
+                    }
+
+                    .file-remove {
+                        align-self: center;
+                        width: 40px;
+                        text-align: center;
+                        font-size: 14px;
+                    }
                 }
 
-                .file-title {
-                    padding: 6px 8px;
-                    width: 0;
-                    flex-grow: 1;
-                    display: flex;
+                .item-error {
+                    padding: 0 10px 10px 10px;
+                    border-top: 1px solid #ddd;
                     font-size: 14px;
-
-                    input {
-                        flex-grow: 1;
-                    }
+                    color: rgba(200, 0, 0, 0.8);
                 }
             }
         }
@@ -219,18 +360,12 @@ export default {
 
     .bottom {
         display: flex;
-        background: #ddd;
+        background: #eee;
         align-items: center;
         height: 40px;
         padding: 0 12px;
 
         .bottom-groups {
-            .openicon {
-            }
-
-            .settingicon {
-            }
-
             .icon {
                 width: 25px;
                 height: 25px;

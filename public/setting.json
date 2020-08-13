@@ -1,0 +1,8 @@
+{
+    "resourceUrl": "",
+    "resourceUrl_default": "http://10.4.80.67:9000/dist/pdfjs-dist/",
+    "templatePath": "",
+    "templatePath_default": "http://10.4.80.67:9000/dist/pdfjs-dist/template",
+    "mode": "canvas",
+    "outputPath": ""
+}
