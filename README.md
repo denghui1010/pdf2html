@@ -45,3 +45,6 @@ npm run electron:serve
   - ```npm run electron:build -- --linux deb tar.xz```
 - window
   - ```npm run electron:build -- --win nsis```
+
+## LICENSE
+[Apache License](/LICENSE)
