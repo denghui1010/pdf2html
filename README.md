@@ -1,42 +1,44 @@
+<div align="right"><strong>🇨🇳<a href="./README_CN.md">中文</a></strong> | <strong>🇬🇧English</strong></div>
+
 # pdf2html
-本软件可以将pdf文件转换为单一的html文件
+this app can transfer pdf file to html file
 
 ![screenshot](./screenshot/home.png)
 
-## 依赖
+## Dependencies
  - [electron](https://github.com/electron/electron)
  - [vue-cli-plugin-electron-builder](https://github.com/nklayman/vue-cli-plugin-electron-builder)
  - [vue](https://github.com/vuejs/vue)
  - [pdfjs](https://github.com/mozilla/pdf.js)
  - [art-template](https://github.com/aui/art-template)
 
-## 特点
-- 单一html文件输出
-- 资源路径可配置
-- 生成模板可配置
-- 全平台支持
+## Features
+- just output one html file
+- resouece url configurable
+- template path configurable
+- linux/mac/window support
 
-## 关于资源文件
-1. 当前html中使用的js/css资源放置在个人服务器下, 不保证稳定性, 建议将项目中的```/public/pdfjs-dist```文件夹放置到自己的服务器上
-2. 当前的生成模板也放置在个人服务器下, 不保证稳定性, 建议将项目中的```/public/template```文件夹放置到自己的服务器上或电脑本地
-3. 完成后可在软件的设置中设置resoure url和template path
-   - resource url只支持url
-   - template path支持本地文件夹和远程url
-4. 资源和模板你都可以进行修改, 自定义最后html的显示样式
+## Resources
+1. the resources now in personal server, suggest put folder ```/public/pdfjs-dist``` into your own server
+2. the templates now in personal server, suggest put folder ```/public/template``` into your own server
+3. finish this, you can modify the setting in the app
+   - resource url only support url
+   - template path support url and local path
+4. you can modify the resources and templates, so that the final output html will be changed.
 
 ![screenshot](./screenshot/setting.png)
 
-## 下载
+## Download
 
 
-## 开发
+## Develop
 ```
 npm install
 npm run electron:serve
 ```
 
-## 打包
-更多请阅读[electron-builder doc](https://www.electron.build/cli)
+## Build
+read more [electron-builder doc](https://www.electron.build/cli)
 - mac & linux & window
   - ```npm run electron:build -- -mwl```
 - mac
