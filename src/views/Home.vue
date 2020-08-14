@@ -2,9 +2,8 @@
     .home(@drop="onDrop", @dragover="dragover")
         .file-area(v-if="fileList&&fileList.length>0")
             .file-nav 
-                .nav1 文件名称
-                .nav2 文档标题
-                .nav3 操作
+                .nav1 文件名称(file name)
+                .nav2 文档标题(html title)
             .filelist
                 .file-item(:class="{success:file.status==='success', error:file.status==='error'}", v-for="(file, index) in fileList", :key="index")
                     .item-content
@@ -13,14 +12,14 @@
                             span {{file.name}}
                             span.status(v-if="file.status") {{file.status}}
                         .file-title
-                            textarea(v-model="file.title", placeholder="不填默认为文件名")
-                        .file-remove(@click="onRemoveClick(index)") 移除
+                            textarea(v-model="file.title", placeholder="不填默认为文件名(default file name)")
+                        .file-remove(@click="onRemoveClick(index)")
                     .item-error(v-if="file.error") {{file.error}}
             .opt
-                .btn.clear(@click="onClearClick") 清空
-                .btn.transferbtn(@click="onTransferClick") 转换
+                .btn.clear(@click="onClearClick") 清空(remove all)
+                .btn.transferbtn(@click="onTransferClick") 转换(transfer)
         .drag-tip(v-else) 
-            div 拖拽文件或文件夹到这里!
+            div 拖拽文件或文件夹到这里!<br>drag and drop file/folder here!
         .bottom
             .log {{log}}
             .bottom-groups
@@ -41,7 +40,8 @@ export default {
         return {
             fileList: [],
             showSetting: false,
-            log: "Develop by liudenghui. https://github.com/denghui1010/pdf2html"
+            log:
+                "Developed by liudenghui. https://github.com/denghui1010/pdf2html"
         };
     },
     created() {
@@ -217,6 +217,8 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+@import '~@/styles/mixin.styl';
+
 .home {
     height: 100vh;
     display: flex;
@@ -252,10 +254,6 @@ export default {
                 width: 0;
                 flex-grow: 1;
             }
-
-            .nav3 {
-                width: 40px;
-            }
         }
 
         .filelist {
@@ -289,7 +287,7 @@ export default {
                     }
 
                     .file-name {
-                        padding: 10px 8px;
+                        padding: 15px 8px;
                         width: 0;
                         flex-grow: 1;
                         border-left: 1px solid #ddd;
@@ -324,9 +322,8 @@ export default {
 
                     .file-remove {
                         align-self: center;
-                        width: 40px;
-                        text-align: center;
-                        font-size: 14px;
+                        icon('~@/assets/icon_close.png', 20px, 20px);
+                        margin: 0 6px;
                     }
                 }
 

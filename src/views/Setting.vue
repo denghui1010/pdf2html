@@ -1,7 +1,7 @@
 <template lang="pug">
     .setting(v-if="show")
-        .closeicon(@click="onCloseClick") 关闭
-        .savebtn(@click="onSaveClick") 保存
+        .closeicon(@click="onCloseClick") 关闭(close)
+        .savebtn(@click="onSaveClick") 保存(save)
         .setting-item
             span resource url
             input(v-model="resourceUrl", :placeholder="resourceUrl_default")
@@ -11,7 +11,7 @@
             img.openicon(src="@/assets/icon_file.png", @click="onTemplateOpenClick")
         .setting-item
             span output path
-            input(v-model="outputPath", placeholder="文件同级目录下")
+            input(v-model="outputPath", placeholder="当前文件目录下(current file directory)")
             img.openicon(src="@/assets/icon_file.png", @click="onOutputOpenClick")
         //- .setting-item
         //-     span work mode
@@ -156,7 +156,7 @@ export default {
 
     .savebtn {
         position: absolute;
-        right: 60px;
+        right: 100px;
         top: 10px;
     }
 }
