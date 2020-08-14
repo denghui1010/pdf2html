@@ -1,8 +1,8 @@
 {
     "resourceUrl": "",
-    "resourceUrl_default": "http://10.4.80.67:9000/dist/pdfjs-dist/",
+    "resourceUrl_default": "https://denghui1010.github.io/pdf2html/public/pdfjs-dist/",
     "templatePath": "",
-    "templatePath_default": "http://10.4.80.67:9000/dist/pdfjs-dist/template",
+    "templatePath_default": "https://denghui1010.github.io/pdf2html/public/template/",
     "mode": "canvas",
     "outputPath": ""
 }
