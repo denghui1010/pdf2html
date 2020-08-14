@@ -1,8 +1,8 @@
 {
     "resourceUrl": "",
-    "resourceUrl_default": "https://denghui1010.github.io/pdf2html/public/pdfjs-dist/",
+    "resourceUrl_default": "http://www.liudh.cn/pdf2html/pdfjs-dist/",
     "templatePath": "",
-    "templatePath_default": "https://denghui1010.github.io/pdf2html/public/template/",
+    "templatePath_default": "http://www.liudh.cn/pdf2html/template/",
     "mode": "canvas",
     "outputPath": ""
 }
