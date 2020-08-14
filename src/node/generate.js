@@ -1,32 +1,28 @@
 const fs = require("fs");
 const template = require("art-template");
 const path = require("path");
-const http = require("http");
-const https = require("https");
+const { net } = require("electron");
 
 let remoteArt = "";
 
 function getArt(url) {
     return new Promise((resolve, reject) => {
-        let request = http;
-        if (url.startsWith("https")) {
-            request = https;
-        }
         console.log("get art", url);
+        const request = net.request(url);
         request
-            .get(url, function(data) {
-                let str = "";
-                data.on("data", function(chunk) {
-                    str += chunk;
+            .on("response", response => {
+                let c = "";
+                response.on("data", chunk => {
+                    c += chunk;
                 });
-                data.on("end", function() {
-                    srt = str.toString();
-                    resolve(str);
+                response.on("end", () => {
+                    resolve(c.toString());
                 });
             })
-            .on("error", e => {
-                reject(e);
+            .on("error", error => {
+                reject(error);
             });
+        request.end();
     });
 }
 

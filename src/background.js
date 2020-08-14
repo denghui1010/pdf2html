@@ -33,7 +33,6 @@ const about = {
     applicationName: app.name,
     applicationVersion: app.getVersion(),
     version: app.getVersion(),
-    copyright: "百信银行 智慧财富事业部",
     authors: ["liudenghui"]
 };
 console.log(about);
@@ -51,8 +50,7 @@ function createWindow() {
             // Use pluginOptions.nodeIntegration, leave this alone
             // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
             webSecurity: false,
-            nodeIntegration: true,
-            preload: path.join(__dirname, "preload.js")
+            nodeIntegration: true
         }
     });
 

@@ -34,6 +34,7 @@
 <script>
 const { remote } = window.require("electron");
 const { dialog } = window.require("electron").remote;
+const { ipcRenderer } = window.require("electron");
 
 export default {
     data() {
@@ -58,7 +59,7 @@ export default {
     },
     methods: {
         onSaveClick() {
-            window.ipcRenderer.send("onSaveSetting", this.$data);
+            ipcRenderer.send("onSaveSetting", this.$data);
             this.onCloseClick();
         },
         onCloseClick() {

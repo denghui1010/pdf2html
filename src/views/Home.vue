@@ -45,7 +45,7 @@ export default {
         };
     },
     created() {
-        window.ipcRenderer.on("onTransferProcess", (event, file) => {
+        ipcRenderer.on("onTransferProcess", (event, file) => {
             console.log("onTransferProcess", file);
             for (let one of this.fileList) {
                 if (one.path === file.path) {
@@ -55,7 +55,7 @@ export default {
             }
             this.fileList = this.fileList.slice();
         });
-        window.ipcRenderer.on("onTransferSuccess", (event, file) => {
+        ipcRenderer.on("onTransferSuccess", (event, file) => {
             console.log("onTransferSuccess", file);
             for (let one of this.fileList) {
                 if (one.path === file.path) {
@@ -65,7 +65,7 @@ export default {
             }
             this.fileList = this.fileList.slice();
         });
-        window.ipcRenderer.on("onTransferError", (event, file, error) => {
+        ipcRenderer.on("onTransferError", (event, file, error) => {
             console.log("onTransferError", file);
             for (let one of this.fileList) {
                 if (one.path === file.path) {
@@ -78,8 +78,8 @@ export default {
         });
     },
     beforeDestroy() {
-        window.ipcRenderer.removeAllListeners("onTransferSuccess");
-        window.ipcRenderer.removeAllListeners("onTransferProcess");
+        ipcRenderer.removeAllListeners("onTransferSuccess");
+        ipcRenderer.removeAllListeners("onTransferProcess");
     },
     methods: {
         parseFileTile(name) {
