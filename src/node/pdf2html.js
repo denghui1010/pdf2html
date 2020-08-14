@@ -5,7 +5,7 @@ const generate = require("./generate");
 function pdf2html(obj) {
     return new Promise((resolve, reject) => {
         let data = fs.readFileSync(obj.path);
-        data = new Buffer(data).toString("base64");
+        data = Buffer.from(data).toString("base64");
         const params = {
             title: obj.title,
             name: obj.name,

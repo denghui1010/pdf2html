@@ -8,6 +8,7 @@
         .setting-item
             span template path
             input(v-model="templatePath", :placeholder="templatePath_default")
+            img.openicon(src="@/assets/icon_file.png", @click="onTemplateOpenClick")
         .setting-item
             span output path
             input(v-model="outputPath", placeholder="文件同级目录下")
@@ -72,6 +73,18 @@ export default {
                     const filePaths = result.filePaths || [];
                     if (filePaths.length > 0) {
                         this.outputPath = filePaths[0];
+                    }
+                });
+        },
+        onTemplateOpenClick() {
+            dialog
+                .showOpenDialog({
+                    properties: ["openDirectory"]
+                })
+                .then(result => {
+                    const filePaths = result.filePaths || [];
+                    if (filePaths.length > 0) {
+                        this.templatePath = filePaths[0];
                     }
                 });
         }
