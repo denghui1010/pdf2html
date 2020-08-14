@@ -41,7 +41,7 @@ export default {
         return {
             fileList: [],
             showSetting: false,
-            log: ""
+            log: "Develop by liudenghui. https://github.com/denghui1010/pdf2html"
         };
     },
     created() {
@@ -50,6 +50,7 @@ export default {
             for (let one of this.fileList) {
                 if (one.path === file.path) {
                     one.status = "handling...";
+                    one.error = "";
                     break;
                 }
             }
@@ -60,6 +61,7 @@ export default {
             for (let one of this.fileList) {
                 if (one.path === file.path) {
                     one.status = "success";
+                    one.error = "";
                     break;
                 }
             }

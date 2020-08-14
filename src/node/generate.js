@@ -1,7 +1,7 @@
 const fs = require("fs");
-const template = require("art-template");
 const path = require("path");
 const { net } = require("electron");
+const template = require("art-template/lib/index");
 
 let remoteArt = "";
 
