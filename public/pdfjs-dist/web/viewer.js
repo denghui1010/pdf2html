@@ -21,7 +21,7 @@ if (!pdfjsLib.getDocument || !pdfjsViewer.PDFViewer) {
 
 var USE_ONLY_CSS_ZOOM = true;
 var TEXT_LAYER_MODE = 0; // DISABLE
-var MAX_IMAGE_SIZE = 1024 * 1024;
+var MAX_IMAGE_SIZE = 2048 * 2048;
 var CMAP_URL = window.CMAP_URL;
 var PDF_DATA = window.PDF_DATA;
 var WORKER_URL = window.WORKER_URL;
