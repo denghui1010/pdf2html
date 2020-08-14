@@ -30,7 +30,10 @@
 
 
 ## 开发
-```npm run electron:serve```
+```
+npm install
+npm run electron:serve
+```
 
 ## 打包
 更多请阅读[electron-builder doc](https://www.electron.build/cli)
