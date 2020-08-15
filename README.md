@@ -29,7 +29,7 @@ this app can transfer a pdf file to a html file
 ![screenshot](./screenshot/setting.png)
 
 ## Download
-
+[v1.0.0](https://github.com/denghui1010/pdf2html/releases/tag/v1.0.0)
 
 ## Develop
 ```
