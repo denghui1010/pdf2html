@@ -27,7 +27,7 @@
 ![screenshot](./screenshot/setting.png)
 
 ## 下载
-
+[v1.0.0](https://github.com/denghui1010/pdf2html/releases/tag/v1.0.0)
 
 ## 开发
 ```
